@@ -1,0 +1,364 @@
+GET _search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+# 测试es是否连接
+# kibana容器配置过es地址, 等同于访问IP: 9200
+GET /
+
+# 测试分词器
+GET /_analyze
+{
+"analyzer": "ik_max_word",
+"text": "小红书初识"
+}
+
+
+# 创建索引库
+PUT /z
+{
+"mappings": {
+"properties": {
+"info": {
+"type": "text",
+"analyzer": "ik_smart"
+},
+"email": {
+"type": "keyword",
+"index": false
+},
+"name": {
+"type": "object",
+"properties": {
+"firstName": {
+"type": "keyword"
+},
+"lastName": {
+"type":"keyword"
+}
+}
+}
+}
+}
+}
+
+# 查询索引库
+GET /z
+
+# 修改索引库, 添加新字段
+# _mapping表示修改索引库的约束
+PUT /z/_mapping
+{
+"properties": {
+"age": {
+"type": "integer"
+}
+}
+}
+
+# 删除索引库
+DELETE /z
+
+
+# 插入文档
+POST /z/_doc/1
+{
+"info": "一句话太多",
+"email": "z@edu.com",
+"name": {
+"firstName": "Z",
+"lastName": "z"
+}
+}
+
+# 查询文档
+GET /z/_doc/1
+
+# 删除文档
+DELETE /z/_doc/1
+
+# 全量修改文档
+PUT /z/_doc/1
+{
+"info": "一句话太多",
+"email":"Zz@edu.com",
+"name": {
+"firstName": "Z",
+"lastName": "z"
+}
+}
+
+# 局部修改文档字段
+POST /z/_update/1
+{
+"doc": {
+"email": "z@edu.com"
+}
+}
+
+# 酒店的mapping
+# all具备所有拷贝进去字段的值, 一个字段中搜索到多个字段的内容
+# 这种拷贝做了优化并不是将文档拷贝, 而只是基于此做倒排索引
+PUT /hotel
+{
+"mappings": {
+"properties": {
+"id": {
+"type": "keyword"
+},
+"name": {
+"type": "text",
+"analyzer": "ik_smart",
+"copy_to": "all"
+},
+"address": {
+"type": "keyword",
+"index": false
+},
+"price": {
+"type": "integer"
+},
+"score": {
+"type": "integer"
+},
+"brand": {
+"type": "keyword",
+"copy_to": "all"
+},
+"city": {
+"type": "keyword"
+},
+"startName": {
+"type": "keyword"
+},
+"business": {
+"type": "keyword",
+"copy_to": "all"
+},
+"location": {
+"type": "geo_point"
+},
+"pic": {
+"type": "keyword",
+"index": false
+},
+"all": {
+"type": "text",
+"analyzer": "ik_smart"
+}
+}
+}
+}
+
+
+# 查询所有
+GET /hotel/_search
+{
+"query": {
+"match_all": {}
+}
+}
+
+
+# 全文检索
+# match查询
+# 相关性算分, 既包含外滩/如家的排名在前 其次是外滩、如家
+GET /hotel/_search
+{
+"query": {
+"match": {
+"all": "外滩如家"
+}
+}
+}
+
+# multi_match查询
+GET /hotel/_search
+{
+"query": {
+"multi_match": {
+"query": "外滩如家",
+"fields": ["name", "brand", "business"]
+}
+}
+}
+
+# 精确查询
+# term查询
+GET /hotel/_search
+{
+"query": {
+"term": {
+"city": {
+"value": "上海"
+}
+}
+}
+}
+
+# range查询
+GET /hotel/_search
+{
+"query": {
+"range": {
+"price": {
+"gte": 1000,
+"lte": 3000
+}
+}
+}
+}
+
+# distance查询
+GET /hotel/_search
+{
+"query": {
+"geo_distance": {
+"distance": "5km",
+"location": "31.21,121.5"
+}
+}
+}
+
+# function score查询
+GET /hotel/_search
+{
+"query": {
+"function_score": {
+"query": {
+"match": {
+"all": "外滩"
+}
+},
+"functions": [
+{
+"filter": {
+"term": {
+"brand": "如家"
+}
+},
+"weight": 10
+}
+],
+"boost_mode": "sum"
+}
+}
+}
+
+# bool查询
+GET /hotel/_search
+{
+"query": {
+"bool": {
+"must": [
+{
+"match": {
+"name": "如家"
+}
+}
+],
+"must_not": [
+{
+"range": {
+"price": {
+"gt": 400
+}
+}
+}
+],
+"filter": [
+{
+"geo_distance": {
+"distance": "10km",
+"location": {
+"lat": 31.21,
+"lon": 121.5
+}
+}
+}
+]
+}
+}
+}
+
+# 搜索结果处理
+# sort排序
+GET /hotel/_search
+{
+"query": {
+"match_all": {}
+},
+"sort": [
+{
+"score": "desc"
+},
+{
+"price": "asc"
+}
+]
+}
+
+# 找到121.612282，31.034661周围的酒店，距离升序排序
+GET /hotel/_search
+{
+"query": {
+"match_all": {}
+},
+"sort": [
+{
+"_geo_distance": {
+"location": {
+"lat": "31.034661",
+"lon": "121.612282"
+},
+"order": "asc",
+"unit": "km"
+}
+}
+]
+}
+
+# 分页查询
+GET /hotel/_search
+{
+"query": {
+"match_all": {
+}
+},
+"sort": [
+{
+"price": "asc"
+}
+],
+"from": 10,
+"size": 20
+}
+
+# 高亮查询, 默认情况下, ES搜索字段必须与高亮字段一致
+GET /hotel/_search
+{
+"query": {
+"match": {
+"all": "如家"
+}
+},
+"highlight": {
+"fields": {
+"name": {
+"require_field_match": "false"
+}
+}
+}
+}
+
+
+# 添加isAd字段
+POST /hotel/_update/2062643516
+{
+"doc": {
+"isAd": true
+}
+}
