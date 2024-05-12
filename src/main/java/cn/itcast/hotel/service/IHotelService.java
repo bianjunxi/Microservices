@@ -5,6 +5,15 @@ import cn.itcast.hotel.pojo.PageResult;
 import cn.itcast.hotel.pojo.RequestParams;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+import java.util.Map;
+
 public interface IHotelService extends IService<Hotel> {
     PageResult search(RequestParams params);
+
+    /**
+     * 获取页面查询条件信息(城市、品牌、星级)
+     * @return
+     */
+    Map<String, List<String> > filters(RequestParams params);
 }

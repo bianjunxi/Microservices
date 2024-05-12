@@ -11,6 +11,9 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortOrder;
@@ -20,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @SpringBootTest
@@ -138,6 +142,36 @@ class HotelSearchTest {
             System.out.println(hotelDoc);
         }
     }
+
+    @Test
+    void testAggregation() throws IOException {
+        // 1.准备request
+        SearchRequest request = new SearchRequest("hotel");
+        // 2.准备DSL
+        // 2.1 设置size
+        request.source().size(0);
+        // 2.2 聚合
+        request.source().aggregation(AggregationBuilders
+                .terms("brandAgg")
+                .field("brand")
+                .size(10)
+        );
+        // 3.发送请求，得到响应
+        SearchResponse response = client.search(request, RequestOptions.DEFAULT);
+        // 4.解析结果
+        Aggregations aggregations = response.getAggregations();
+        // 4.1 根据聚合名称获取解析结果
+        Terms terms = aggregations.get("brandAgg");
+        // 4.2 获取bulks
+        List<? extends Terms.Bucket> buckets = terms.getBuckets();
+        // 4.3 遍历
+        for (Terms.Bucket bucket : buckets){
+            // 4.4.获取key
+            String key = bucket.getKeyAsString();
+            System.out.println(key);
+        }
+    }
+
 
     @BeforeEach
     void setUp() {
