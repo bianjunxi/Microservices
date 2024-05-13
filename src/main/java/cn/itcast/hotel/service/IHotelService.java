@@ -16,4 +16,16 @@ public interface IHotelService extends IService<Hotel> {
      * @return
      */
     Map<String, List<String> > filters(RequestParams params);
+
+    /**
+     * 新增或者修改文档
+     * @param id
+     */
+    void insertById(Long id);
+
+    /**
+     * 删除文档
+     * @param id
+     */
+    void deleteById(Long id);
 }
