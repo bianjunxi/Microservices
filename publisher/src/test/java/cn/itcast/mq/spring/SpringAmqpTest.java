@@ -45,4 +45,11 @@ public class SpringAmqpTest {
         rabbitTemplate.convertAndSend(exchange,"",message);
     }
 
+    @Test
+    public void testSendDirectExchange(){
+        String exchange = "direct";
+        String message = "hello,red!";
+        rabbitTemplate.convertAndSend(exchange,"red",message);
+    }
+
 }
