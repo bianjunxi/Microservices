@@ -38,4 +38,11 @@ public class SpringAmqpTest {
         }
     }
 
+    @Test
+    public void testSendFountExchange(){
+        String exchange = "fanout";
+        String message = "hello,every one!";
+        rabbitTemplate.convertAndSend(exchange,"",message);
+    }
+
 }
