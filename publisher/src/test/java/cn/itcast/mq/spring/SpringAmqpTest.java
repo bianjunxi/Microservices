@@ -52,4 +52,11 @@ public class SpringAmqpTest {
         rabbitTemplate.convertAndSend(exchange,"red",message);
     }
 
+    @Test
+    public void testSendTopicExchange(){
+        String exchange = "topic";
+        String message = "天气很不错!";
+        rabbitTemplate.convertAndSend(exchange,"china.weather",message);
+    }
+
 }
