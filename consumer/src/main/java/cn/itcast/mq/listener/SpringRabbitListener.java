@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Map;
 
 /**
  * ClassName:  SpringRabbitListener
@@ -91,6 +92,12 @@ public class SpringRabbitListener {
     ))
     public void listenTopicQueue2(String msg){
         System.out.println("TopicQueue2接收到的消息是：" + msg);
+    }
+
+    //测试消息转换器
+    @RabbitListener(queues = "object.queue")
+    public void listenSimpleQueueMessage(Map<String,Object> msg) {
+        System.out.println("spring接收到的消息是：" + msg);
     }
 
 
