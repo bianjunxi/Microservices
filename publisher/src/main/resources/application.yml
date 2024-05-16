@@ -10,3 +10,7 @@ spring:
     username: root
     password: root
     virtual-host: /
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
