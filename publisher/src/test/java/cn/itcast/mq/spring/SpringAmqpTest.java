@@ -3,12 +3,16 @@ package cn.itcast.mq.spring;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Slf4j
@@ -51,4 +55,17 @@ public class SpringAmqpTest {
         // ② 消息没有到达队列：交换机没投递到队列服务器故障、队列名称写错
         rabbitTemplate.convertAndSend("amq.topic", routingKey, message, correlationData);
     }
+
+    //消息持久化
+    @Test
+    public void testDurableMessage() throws InterruptedException {
+        //1.准备消息
+        Message message = MessageBuilder.withBody("hello, spring amqp!".getBytes(StandardCharsets.UTF_8))
+                .setDeliveryMode(MessageDeliveryMode.PERSISTENT)
+                .build();
+        //2.发送消息
+        rabbitTemplate.convertAndSend("simple.queue",message);
+        // 3.测试发送消息后，不开启消费者，重启服务查看控制面板消息是否丢失
+    }
+
 }
