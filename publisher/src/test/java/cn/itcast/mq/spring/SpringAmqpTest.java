@@ -64,7 +64,7 @@ public class SpringAmqpTest {
                 .setDeliveryMode(MessageDeliveryMode.PERSISTENT)
                 .build();
         //2.发送消息
-        rabbitTemplate.convertAndSend("simple.queue",message);
+        rabbitTemplate.convertAndSend("simple.queue", message);
         // 3.测试发送消息后，不开启消费者，重启服务查看控制面板消息是否丢失
     }
 
@@ -78,7 +78,7 @@ public class SpringAmqpTest {
                 .setExpiration("5000")
                 .build();
         //2.发送消息
-        rabbitTemplate.convertAndSend("ttl.direct","ttl",message);
+        rabbitTemplate.convertAndSend("ttl.direct", "ttl", message);
     }
 
     //死信插件实现延迟消息
@@ -88,10 +88,42 @@ public class SpringAmqpTest {
         Message message = MessageBuilder
                 .withBody("hello, spring ttl message!".getBytes(StandardCharsets.UTF_8))
                 .setDeliveryMode(MessageDeliveryMode.PERSISTENT)
-                .setHeader("x-delay",5000)
+                .setHeader("x-delay", 5000)
                 .build();
         //2.发送消息
-        rabbitTemplate.convertAndSend("delay.direct","delay",message);
+        rabbitTemplate.convertAndSend("delay.direct", "delay", message);
     }
+
+    //惰性队列
+    @Test
+    public void testLazyQueue() throws InterruptedException {
+        for (int i = 0; i < 1000000; i++) {
+            //1.准备消息
+            Message message = MessageBuilder
+                    .withBody("hello, spring!".getBytes(StandardCharsets.UTF_8))
+                    .setDeliveryMode(MessageDeliveryMode.NON_PERSISTENT)
+                    .build();
+            //2.发送消息
+            rabbitTemplate.convertAndSend("lazy.queue", message);
+        }
+
+    }
+
+    @Test
+    public void testNormalQueue() throws InterruptedException {
+        for (int i = 0; i < 1000000; i++) {
+            //1.准备消息
+            Message message = MessageBuilder
+                    .withBody("hello, spring!".getBytes(StandardCharsets.UTF_8))
+                    .setDeliveryMode(MessageDeliveryMode.NON_PERSISTENT)
+                    .build();
+            //2.发送消息
+            rabbitTemplate.convertAndSend("normal.queue", message);
+
+            //分别发送两个消息,观察平台管理端两个队列的消息波动
+        }
+
+    }
+
 
 }
