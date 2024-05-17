@@ -23,6 +23,7 @@ public class SpringRabbitListener {
         log.info("消费者消息处理成功！");
     }
 
+    //死信交换机 + TTL实现延迟消息
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(name = "dl.queue",durable = "true"),
             exchange = @Exchange(name = "dl.direct"),
@@ -31,4 +32,15 @@ public class SpringRabbitListener {
     public void listenDlQueue(String msg){
         log.info("消费者接收到了dl.queue的延迟消息");
     }
+
+    //使用死信插件实现延迟消息
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "delay.queue",durable = "true"),
+            exchange = @Exchange(name = "delay.direct",delayed = "true"),
+            key = "delay"
+    ))
+    public void listenDelayExchange(String msg){
+        log.info("消费者接收到了delay.queue的延迟消息");
+    }
+
 }

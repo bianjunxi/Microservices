@@ -68,7 +68,7 @@ public class SpringAmqpTest {
         // 3.测试发送消息后，不开启消费者，重启服务查看控制面板消息是否丢失
     }
 
-    //延迟消息
+    //死信交换机 + TTL 延迟消息
     @Test
     public void testTTLMessage() throws InterruptedException {
         //1.准备消息
@@ -81,5 +81,17 @@ public class SpringAmqpTest {
         rabbitTemplate.convertAndSend("ttl.direct","ttl",message);
     }
 
+    //死信插件实现延迟消息
+    @Test
+    public void testSendDelayMessage() throws InterruptedException {
+        //1.准备消息
+        Message message = MessageBuilder
+                .withBody("hello, spring ttl message!".getBytes(StandardCharsets.UTF_8))
+                .setDeliveryMode(MessageDeliveryMode.PERSISTENT)
+                .setHeader("x-delay",5000)
+                .build();
+        //2.发送消息
+        rabbitTemplate.convertAndSend("delay.direct","delay",message);
+    }
 
 }
