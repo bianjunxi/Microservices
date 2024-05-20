@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Jay
  * @version v1.0
  */
-@Configuration
+//@Configuration
 public class TTLMessageConfig {
 
     @Bean

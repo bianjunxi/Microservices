@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 消费者启动的时候就会创建队列和交换机
  */
-@Configuration
+//@Configuration
 public class CommonConfig {
     //交换机持久化
     @Bean

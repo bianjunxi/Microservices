@@ -13,7 +13,7 @@ public class SpringRabbitListener {
 
     private static final Logger log = LoggerFactory.getLogger(SpringRabbitListener.class);
 
-    @RabbitListener(queues = "simple.queue")
+/*    @RabbitListener(queues = "simple.queue")
     public void listenSimpleQueue(String msg) {
         //debug：方便查看消息重试对应的时间，
         //重试次数超过4次，会Spring会返回reject拒接，rabbitmq丢弃消息
@@ -21,7 +21,7 @@ public class SpringRabbitListener {
         log.debug("消费者接收到simple.queue的消息：【" + msg + "】");
         System.out.println(1/0);
         log.info("消费者消息处理成功！");
-    }
+    }*/
 
     //死信交换机 + TTL实现延迟消息
     @RabbitListener(bindings = @QueueBinding(
@@ -34,13 +34,13 @@ public class SpringRabbitListener {
     }
 
     //使用死信插件实现延迟消息
-    @RabbitListener(bindings = @QueueBinding(
+/*    @RabbitListener(bindings = @QueueBinding(
             value = @Queue(name = "delay.queue",durable = "true"),
             exchange = @Exchange(name = "delay.direct",delayed = "true"),
             key = "delay"
     ))
     public void listenDelayExchange(String msg){
         log.info("消费者接收到了delay.queue的延迟消息");
-    }
+    }*/
 
 }

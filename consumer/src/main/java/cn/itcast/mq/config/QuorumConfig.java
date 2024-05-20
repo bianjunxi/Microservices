@@ -6,23 +6,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * ClassName:  LasyConfig
+ * ClassName:  QuorumConfig
  * Description:
  *
  * @author Jay
  * @version v1.0
  */
-//@Configuration
-public class LazyConfig {
+@Configuration
+public class QuorumConfig {
 
     @Bean
-    public Queue lazyQueue() {
-        return QueueBuilder.durable("lazy.queue").lazy().build();
-    }
-
-    @Bean
-    public Queue normalQueue() {
-        return QueueBuilder.durable("normal.queue").build();
+    public Queue quorumQueue() {
+        return QueueBuilder.durable("quorum.queue").quorum().build();
     }
 
 }
